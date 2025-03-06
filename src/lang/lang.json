@@ -1,0 +1,87 @@
+[
+    {
+        "name": "English (Australia)",
+        "code": "en",
+        "tld": "com.au"
+    },
+    {
+        "name": "English (United Kingdom)",
+        "code": "en",
+        "tld": "co.uk"
+    },
+    {
+        "name": "English (United States)",
+        "code": "en",
+        "tld": "us"
+    },
+    {
+        "name": "English (Canada)",
+        "code": "en",
+        "tld": "ca"
+    },
+    {
+        "name": "English (India)",
+        "code": "en",
+        "tld": "co.in"
+    },
+    {
+        "name": "English (Ireland)",
+        "code": "en",
+        "tld": "ie"
+    },
+    {
+        "name": "English (South Africa)",
+        "code": "en",
+        "tld": "co.za"
+    },
+    {
+        "name": "English (Nigeria)",
+        "code": "en",
+        "tld": "com.ng"
+    },
+    {
+        "name": "French (Canada)",
+        "code": "fr",
+        "tld": "ca"
+    },
+    {
+        "name": "French (France)",
+        "code": "fr",
+        "tld": "fr"
+    },
+    {
+        "name": "Mandarin (China Mainland)",
+        "code": "zh-CN",
+        "tld": "zh-CN"
+    },
+    {
+        "name": "Mandarin (Taiwan)",
+        "code": "zh-TW",
+        "tld": "zh-TW"
+    },
+    {
+        "name": "Portuguese (Brazil)",
+        "code": "pt",
+        "tld": "com.br"
+    },
+    {
+        "name": "Portuguese (Portugal)",
+        "code": "pt",
+        "tld": "pt"
+    },
+    {
+        "name": "Spanish (Mexico)",
+        "code": "es",
+        "tld": "com.mx"
+    },
+    {
+        "name": "Spanish (Spain)",
+        "code": "es",
+        "tld": "es"
+    },
+    {
+        "name": "Spanish (United States)",
+        "code": "es",
+        "tld": "us"
+    }
+]
