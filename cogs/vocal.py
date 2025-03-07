@@ -19,10 +19,12 @@ class Vocal(commands.Cog) :
 
     bot: commands.Bot
     languages: list[dict]
+    playing: list[int]
 
     def __init__(self, bot: commands.Bot) -> None :
         self.bot = bot
         self.languages = load_languages()
+        self.playing = []
 
     @commands.Cog.listener()
     async def on_ready(self) -> None :
@@ -40,33 +42,49 @@ class Vocal(commands.Cog) :
 
         self.languages = load_languages()
 
-    async def check_and_join_vc(self, i: dc.Interaction, voice_channel: Optional[dc.VoiceChannel] = None) \
-            -> tuple[Optional[dc.VoiceChannel], Optional[Exception]] :
+    @staticmethod
+    async def check_and_join_vc(i: dc.Interaction, voice_channel: Optional[dc.VoiceChannel] = None) \
+            -> tuple[dc.VoiceChannel | None, Exception] :
 
-        guild_vc: dc.VoiceProtocol = i.guild.voice_client
+        guild_vp: dc.VoiceProtocol = i.guild.voice_client
 
-        if i.user.id not in [''] :
+        # selected voice channel not in the current guild
+        if voice_channel not in i.guild.voice_channels :
+            return None, ChannelNotInGuildException('Unknown channel, this channel doesn\'t exist is this server.')
 
-            if guild_vc is not None :
-                return None, AlreadyConnectedException('I\'m already connected to')
+        # voice channel is None ?
+        if voice_channel is None :
+            uv: dc.VoiceState = i.user.voice
+            # user voice channel is None ?
+            if uv is None :
+                return None, UserNotConnectedException('You are not connected to a voice channel')
+            voice_channel = uv.channel
 
-            if voice_channel is None :
+        # bot is already connected to a voice channel
+        if guild_vp is not None :
 
-                uc: dc.VoiceChannel = i.user.voice.channel
-                if uc is None :
-                    return None, UserNotConnectedException('You are not connected to a voice channel')
+            vc: dc.abc.Connectable = guild_vp.channel
+            # bot is already connected to the target channel
+            if vc.id == voice_channel.id :
+                return None, AlreadyConnectedException(f'I\'m already connected to {voice_channel}.')
 
-                voice_channel = uc
-
-            if self.bot.voice_clients :
-                return None, AlreadyConnectedException('You are not allowed to move the bot from')
-
-                # TODO: check if user auth, and bot not already in a channel
-
-        if
+            # user hasn't permission to move the bot
+            if not i.user.guild_permissions.move_members :
+                return None, NotAllowedException(f'You haven\'t the permission to move me from {vc} to {voice_channel}.')
 
         # connect to the voice channel
-        return await voice_channel.connect(self_deaf=True)
+        return await voice_channel.connect(self_deaf=True), NULL
+
+    @staticmethod
+    async def check_and_leave_vc(i: Optional[dc.Interaction] = None) :
+
+        voice_channel: dc.VoiceChannel
+
+        if i is not None :
+            uc: dc.VoiceChannel = i.user.voice.channel
+
+        for
+
 
     @dc.app_commands.command()
     async def join(self, i: dc.Interaction, channel: Optional[dc.VoiceChannel] = None) -> None :
@@ -75,12 +93,21 @@ class Vocal(commands.Cog) :
         await i.response.defer(ephemeral=True)  # type: ignore
         r: dc.InteractionMessage = await i.original_response()
 
+        vc: dc.VoiceChannel
+        err: Exception
         vc, err = self.check_and_join_vc(i, channel)
+        if err != NULL :
+            await r.edit(content=f'Can\'t connect to the voice channel: {err}')
+            return
 
-        await r.edit(content=f'Successfully connected to {}.')
+        await r.edit(content=f'Successfully connected to {vc}.')
 
     @dc.app_commands.command()
-    async def leave(self, i: dc.Interaction) :
+    async def leave(self, i: dc.Interaction) -> None :
+
+        await i.response.defer(ephemeral=True)  # type: ignore
+        r: dc.InteractionMessage = await i.original_response()
+
 
 async def setup(bot: commands.Bot) -> None :
     await bot.add_cog(Vocal(bot))
