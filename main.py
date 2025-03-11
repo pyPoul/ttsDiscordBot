@@ -4,6 +4,8 @@ from os import listdir
 import discord as dc
 from discord.ext import commands
 
+from utils.constants import BOT_TOKEN, AUTH_USERS
+
 
 # client / bot
 client: commands.Bot = commands.Bot(
@@ -31,17 +33,17 @@ async def sync(ctx: commands.Context) -> None :
     """
 
     # authorized users only
-    if ctx.author.id not in [''] :
+    if ctx.author.id not in AUTH_USERS :
         return
 
-    await client.tree.sync()
+    print(await client.tree.sync())
     await client.wait_until_ready()
     await ctx.send('Done !', ephemeral=True)
 
 
 async def amain() -> None :
     await load()
-    await client.start('')
+    await client.start(BOT_TOKEN)
 
 
 run(amain())

@@ -1,9 +1,11 @@
 .idea
 .vscode
 .venv
+__pycache__
 
 *test*
 
 constants.py
+*.pyc
 
 .env
