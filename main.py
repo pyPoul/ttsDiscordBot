@@ -40,13 +40,6 @@ async def sync(ctx: commands.Context) -> None :
     await ctx.send('Done !', ephemeral=True)
 
 
-@client.hybrid_command(hidden=True)
-async def test(ctx: commands.Context) :
-    print('test')
-    print(ctx.author.voice.channel)
-    print('test')
-
-
 async def amain() -> None :
     await load()
     await client.start(BOT_TOKEN)

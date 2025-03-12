@@ -1,4 +1,5 @@
 from typing import Optional
+from re import split
 import json
 
 import discord as dc
@@ -8,21 +9,53 @@ from utils.constants import AUTH_USERS
 from utils.error import *
 
 
-def load_languages() -> list[dict] :
+def _load_languages() -> list[dict] :
 
     with open('src/lang/lang.json', 'r', encoding='UTF-8') as f :
         return json.load(f)
 
 
+def _convert_to_choices(l: list[dict]) -> list[dc.app_commands.Choice] :
+
+    c: list[dc.app_commands.Choice] = []
+
+    for lang in l :
+        c.append(dc.app_commands.Choice(name=lang['name'], value=lang['tld']))
+
+    return c
+
+
+def _tokenize(text: str) -> list[str] :
+
+    final_text: list[str] = []
+
+    # split text
+    l: list[str] = split(r'[.!?]', text.lower())
+
+    for s in l :
+
+        # split sentences
+        words = split('\s+', s)
+
+        if len(words) < 15 :
+            final_text.append(s)
+            continue
+
+        for i in range(0, len(words), 15) :
+            final_text.append(' '.join(words[i:i+15]).lstrip())
+
+    return l
+
+
 class Vocal(commands.Cog) :
 
     bot: commands.Bot
-    languages: list[dict]
     playing: list[int]
+
+    languages: list[dict] = _load_languages()
 
     def __init__(self, bot: commands.Bot) -> None :
         self.bot = bot
-        self.languages = load_languages()
         self.playing = []
 
     @commands.Cog.listener()
@@ -39,7 +72,16 @@ class Vocal(commands.Cog) :
         if i.user.id not in AUTH_USERS :
             return
 
-        self.languages = load_languages()
+        Vocal.languages = _load_languages()
+
+    @staticmethod
+    def _get_language(tld: str) -> dict[str, str] :
+
+        for l in Vocal.languages :
+            if l['tld'] == tld :
+                return l
+
+        return {}
 
     @staticmethod
     async def check_and_join_vc(i: dc.Interaction, voice_channel: Optional[dc.VoiceChannel] = None) \
@@ -114,7 +156,7 @@ class Vocal(commands.Cog) :
         return NULL
 
     @dc.app_commands.command()
-    async def join(self, i: dc.Interaction, channel: Optional[dc.VoiceChannel] = None) -> None :
+    async def join(self, i: dc.Interaction, channel: Optional[dc.VoiceChannel] = None) ->  None :
         """
         join a voice channel
         """
@@ -146,6 +188,34 @@ class Vocal(commands.Cog) :
             return
 
         await r.edit(content='Successfully disconnected from the voice channel.')
+
+
+    @dc.app_commands.command()
+    @dc.app_commands.choices(lang=_convert_to_choices(languages))
+    async def say(
+            self,
+            i: dc.Interaction,
+            text: str,
+            lang: Optional[dc.app_commands.Choice[str]] = 'fr',
+            channel: Optional[dc.VoiceChannel] = None,
+    ) -> None :
+
+        await i.response.defer(ephemeral=True)  # type: ignore
+        r: dc.InteractionMessage = await i.original_response()
+
+        vc: dc.VoiceChannel
+        err: Exception
+        vc, err = await self.check_and_join_vc(i, channel)
+        if err != NULL:
+            await r.edit(content=f'Can\'t connect to the voice channel: {err}')
+            return
+
+        await r.edit(content='Converting ...')
+
+
+
+        await r.edit(content='Playing ...')
+
 
 
 async def setup(bot: commands.Bot) -> None :
