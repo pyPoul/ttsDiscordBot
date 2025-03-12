@@ -9,7 +9,7 @@ from utils.constants import BOT_TOKEN, AUTH_USERS
 
 # client / bot
 client: commands.Bot = commands.Bot(
-    command_prefix='aprefix',
+    command_prefix='aprefix ',
     description="a description",
     intents=dc.Intents.all()
 )
@@ -36,9 +36,15 @@ async def sync(ctx: commands.Context) -> None :
     if ctx.author.id not in AUTH_USERS :
         return
 
-    print(await client.tree.sync())
     await client.wait_until_ready()
     await ctx.send('Done !', ephemeral=True)
+
+
+@client.hybrid_command(hidden=True)
+async def test(ctx: commands.Context) :
+    print('test')
+    print(ctx.author.voice.channel)
+    print('test')
 
 
 async def amain() -> None :

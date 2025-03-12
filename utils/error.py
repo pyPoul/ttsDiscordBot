@@ -24,6 +24,12 @@ class UserNotConnectedException(Exception) :
         super().__init__(s)
 
 
+class ClientNotConnectedException(Exception) :
+
+    def __init__(self, s: str) -> None :
+        super().__init__(s)
+
+
 class ChannelNotInGuildException(Exception) :
 
     def __init__(self, s: str) -> None :
